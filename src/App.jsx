@@ -1,4 +1,7 @@
 import { useState } from "react";
+import SearchBar from "./components/SearchBar/SearchBar";
+import TrackList from "./components/TrackList/TrackList";
+import Playlist from "./components/Playlist/Playlist";
 
 function App() {
 
@@ -30,6 +33,9 @@ function App() {
   return (
     <div>
       <h1>Playlist Spotify App</h1>
+      <SearchBar onSearch={() => {}}/>
+      <TrackList tracks={userSearch} onAction={addTrackToPlaylist} action={'+'}/>
+      <Playlist tracks={trackList} onAction={removeTrackToPlaylist} action={'-'} playlistName={playlistName} onNameChange={handleNameChange} onSave={() => {}}/>
     </div>
   );
 }
