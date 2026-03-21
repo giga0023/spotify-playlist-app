@@ -1,3 +1,6 @@
+// Salva il token di accesso che estraiamo con getAccessToken() per poterlo usare in tutte le funzioni
+let accessToken = null;
+
 // Reinderizza l'utente alla pagina di login di Spotify
 const redirectToSpotifyLogin = () => {
     const client_id = import.meta.env.VITE_SPOTIFY_CLIENT_ID
@@ -22,13 +25,28 @@ const getAccessToken = async () => {
                 code: code,
                 redirect_uri: 'http://127.0.0.1:5173/callback'
             })
-        }
-        )
+        })
     if (response.ok) {
         const jsonResponse = await response.json()
+        accessToken = jsonResponse.access_token
         return jsonResponse.access_token
     }
 } catch (error) {
     console.log(error)
 }
 };
+
+// Restituisce array di canzoni in base alla ricerca dell'utente
+const searchTracks = async (query) => {
+    try {
+        const response = await fetch(`https://api.spotify.com/v1/search?q=${query}&type=track`, {
+            headers : {'Authorization' : `Bearer ${accessToken}`}
+        })
+        if (response.ok) {
+            const jsonResponse = await response.json()
+            return jsonResponse.tracks.items
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
