@@ -49,4 +49,35 @@ const searchTracks = async (query) => {
     } catch (error) {
         console.log(error)
     }
-}
+};
+
+// Ottiene ID utente loggato - crea la playlist e aggiunge le canzoni
+const savePlaylist = async (playlistName, tracks) => {
+    try {
+        const firstResponse = await fetch('https://api.spotify.com/v1/me', {
+            headers : {'Authorization' : `Bearer ${accessToken}`}
+        })
+        const firstJson = await firstResponse.json()
+        const userId = firstJson.id
+        const secondResponse = await fetch(`https://api.spotify.com/v1/users/${userId}/playlists`, {
+            method : 'POST',
+            headers : {
+                'Authorization' : `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name: playlistName })
+        })
+        const secondJson = await secondResponse.json()
+        const playlistId = secondJson.id
+        const thirdResponse = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+            method : 'POST',
+            headers : {
+                'Authorization' : `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ uris: tracks.map(t => t.uri) })
+        })
+    } catch (error) {
+        console.log(error)
+    }
+};
