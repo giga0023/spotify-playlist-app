@@ -4,3 +4,31 @@ const redirectToSpotifyLogin = () => {
     return window.location.href = `https://accounts.spotify.com/authorize?client_id=${client_id}&response_type=code&redirect_uri=http://127.0.0.1:5173/callback&scope=playlist-modify-public`
 };
 
+// Scambia il code con il token di accesso di Spotify
+const getAccessToken = async () => {
+    const params = new URLSearchParams(window.location.search)
+    const code = params.get('code')
+    const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID
+    const clientSecret = import.meta.env.VITE_SPOTIFY_CLIENT_SECRET
+    try {
+        const response = await fetch('https://accounts.spotify.com/api/token', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Basic ${btoa(clientId + ':' + clientSecret)}`,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                grant_type: 'authorization_code',
+                code: code,
+                redirect_uri: 'http://127.0.0.1:5173/callback'
+            })
+        }
+        )
+    if (response.ok) {
+        const jsonResponse = await response.json()
+        return jsonResponse.access_token
+    }
+} catch (error) {
+    console.log(error)
+}
+};
